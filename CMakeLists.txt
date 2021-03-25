@@ -7,4 +7,4 @@ include_directories(., /Users/andy/emsdk/upstream/emscripten/system/include)
 
 add_executable(Chip8
         Chip8.cpp
-        Chip8.h main.cpp)
+        Chip8.h index.cpp)

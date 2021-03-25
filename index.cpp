@@ -12,8 +12,6 @@ using namespace std;
 static Chip8 chip8;
 static char *rom;
 static size_t romSize;
-static unsigned delay = 1000;
-static bool playing;
 
 extern "C"
 {
@@ -45,6 +43,6 @@ EMSCRIPTEN_KEEPALIVE void setKey(size_t key, bool on) {
 
 EMSCRIPTEN_KEEPALIVE void cycle() {
     chip8.Cycle();
-    MAIN_THREAD_EM_ASM({ updateCanvas($0); }, chip8.GetVideoPointer());
+    MAIN_THREAD_EM_ASM({ chip8.updateCanvas($0); }, chip8.GetVideoPointer());
 }
 }

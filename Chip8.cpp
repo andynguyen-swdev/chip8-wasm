@@ -95,7 +95,7 @@ void Chip8::SetKey(size_t id, bool on) {
 
 void Chip8::Reset() {
     fill(begin(registers), end(registers), (uint8_t) 0);
-    fill(begin(video), end(video), (uint32_t) 0);
+    fill(begin(video), end(video), (uint32_t) 0xFF000000);
     sp = 0;
     delayTimer = 0;
     soundTimer = 0;
@@ -163,7 +163,7 @@ uint8_t Chip8::RandByte() {
  * Clear the display.
  */
 void Chip8::OP_00E0() {
-    memset(video, 0, sizeof(video));
+    memset(video, 0xFF000000, sizeof(video));
 }
 
 /**
@@ -417,9 +417,9 @@ void Chip8::OP_Dxyn() {
             auto posX = (startX + col) % VIDEO_WIDTH;
             auto &screenPixel = video[posX + posY * VIDEO_WIDTH];
 
-            if (screenPixel) {
+            if (screenPixel & 0x00FFFFFF) {
                 registers[0xF] = 1; // Set VF = 1 as this pixel is erased.
-                screenPixel = 0;    // XOR this pixel
+                screenPixel = 0xFF000000;    // XOR this pixel
             } else {
                 screenPixel = 0xFFFFFFFF; // XOR this pixel
             }
