@@ -1,1 +1,1 @@
-emcc -O3 -s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' -pthread -o build/libmain.js index.cpp Chip8.cpp
+emcc -O3 -s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS='["cwrap"]' -o build/libmain.js index.cpp Chip8.cpp

@@ -6,14 +6,10 @@ Module.onRuntimeInitialized = async _ => {
         allocateROM: Module.cwrap('allocateROM', 'number', ['number']),
         loadROM: Module.cwrap('loadROM', 'void', []),
         getROMPointer: Module.cwrap('getROMPointer', 'number', []),
-        setDelay: Module.cwrap('setDelay', 'void', ['number']),
-        start: Module.cwrap('start', 'void', []),
-        stop: Module.cwrap('stop', 'void', []),
         resetState: Module.cwrap('resetState'),
         setKey: Module.cwrap('setKey'),
+        cycle: Module.cwrap('cycle'),
     };
-
-    api.setDelay(1000 / 60);
 
     const romSelectElement = document.getElementById("rom_list");
     const romList = await fetch('roms/roms.json').then(res => res.json());
@@ -33,10 +29,10 @@ Module.onRuntimeInitialized = async _ => {
         const romPointer = api.allocateROM(romData.byteLength);
         // noinspection JSCheckFunctionSignatures
         Module.HEAPU8.set(new Uint8Array(romData), romPointer);
-        api.stop();
+        stop();
         api.resetState();
         api.loadROM();
-        api.start();
+        start();
     })
 
     const keyMappings = {
@@ -69,6 +65,15 @@ Module.onRuntimeInitialized = async _ => {
             api.setKey(id, false);
         }
     });
+
+    let intervalID;
+    function start() {
+        intervalID = setInterval(api.cycle, 1000 / 60);
+    }
+    function stop() {
+        if (!intervalID) return
+        clearInterval(intervalID);
+    }
 };
 
 function updateCanvas(videoPointer) {
