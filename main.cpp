@@ -15,23 +15,16 @@ static size_t romSize;
 static unsigned delay = 1000;
 static bool playing;
 
-EM_JS(void, jsUpdateCanvas, (void * videoPointer), {
-    postMessage({cmd: "updateCanvas", data: videoPointer});
-});
-
 void _play() {
     playing = true;
 
     auto lastCycleTime = std::chrono::high_resolution_clock::now();
     while (playing) {
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float dt = std::chrono::duration<float, std::chrono::milliseconds::period>(currentTime - lastCycleTime).count();
+        chip8.Cycle();
+        MAIN_THREAD_EM_ASM({ updateCanvas($0); }, chip8.GetVideoPointer());
 
-        if (dt > delay) {
-            lastCycleTime = currentTime;
-            chip8.Cycle();
-            jsUpdateCanvas(chip8.GetVideoPointer());
-        }
+        lastCycleTime += std::chrono::milliseconds(delay);
+        std::this_thread::sleep_until(lastCycleTime);
     }
 }
 
@@ -71,5 +64,10 @@ EMSCRIPTEN_KEEPALIVE void stop() {
 EMSCRIPTEN_KEEPALIVE void resetState() {
     chip8.Reset();
 }
+
+EMSCRIPTEN_KEEPALIVE void setKey(size_t key, bool on) {
+    chip8.SetKey(key, on);
+}
+
 
 }

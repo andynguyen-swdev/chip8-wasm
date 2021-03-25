@@ -89,6 +89,11 @@ uint32_t *const Chip8::GetVideoPointer() {
     return video;
 }
 
+void Chip8::SetKey(size_t id, bool on) {
+    if (id > KEYPAD_COUNT) throw runtime_error("Invalid key id: " + to_string(id));
+    keypad[id] = on;
+}
+
 void Chip8::Reset() {
     fill(begin(registers), end(registers), (uint8_t) 0);
     fill(begin(video), end(video), (uint32_t) 0);
@@ -121,10 +126,11 @@ void Chip8::LoadRom(char *const buffer, size_t size) {
 
 
 void Chip8::Cycle() {
-    opcode = (memory[pc] << 8) | memory[pc + 1];
-    pc += 2;
-
-    (this->*table[(opcode & 0xF000) >> 12])();
+    for (int i = 0; i < 10; i++) {
+        opcode = (memory[pc] << 8) | memory[pc + 1];
+        pc += 2;
+        (this->*table[(opcode & 0xF000) >> 12])();
+    }
 
     if (delayTimer > 0) delayTimer--;
     if (soundTimer > 0) soundTimer--;

@@ -19,6 +19,8 @@ public:
 
     void Reset();
 
+    void SetKey(size_t id, bool on);
+
     uint32_t* const GetVideoPointer();
 
 private:
